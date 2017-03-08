@@ -1,37 +1,32 @@
-# from django.shortcuts import render
-#from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-#from rest_framework.renderers import JSONRenderer
-#from rest_framework.parsers import JSONParser
+from django.contrib.auth.models import User
 from . import models
 from . import serializers
-#from rest_framework.views import APIView
-#from rest_framework.response import Response
-#from rest_framework import status
+from rest_framework import status
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
+from documents.permissions import IsOwnerOrReadOnly
+#from rest_framework import permissions
 
-# class ListDocuments(APIView):
-#     def get(self, request, format=None):
-#         documents = Document.objects.all()
-#         #many=True tells serializer to pass in multiple objects
-#         serializer = DocumentSerializer(documents, many=True)
-#         return Response(serializer.data)
-#
-#     def post(self, request, format=None):
-#         serializer = DocumentSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
 
 class ListCreateCompany(generics.ListCreateAPIView):
     queryset = models.Company.objects.all()
     serializer_class = serializers.CompanySerializer
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
 class RetrieveUpdateDestroyCompany(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Company.objects.all()
     serializer_class = serializers.CompanySerializer
+    permission_classes = (IsOwnerOrReadOnly,)
 
 
 class ListCreateDocument(generics.ListCreateAPIView):

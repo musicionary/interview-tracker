@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from . import models
 
@@ -10,6 +11,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
    class Meta:
       model = models.Company
+      owner = serializers.ReadOnlyField(source='owner.username')
       fields = (
          'id',
          'name',
@@ -37,4 +39,13 @@ class CompanySerializer(serializers.ModelSerializer):
          'follow_up_steps',
          'created_at',
          'updated_at',
+         'owner',
       )
+
+
+class UserSerializer(serializers.ModelSerializer):
+   companies = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Company.objects.all())
+
+   class Meta:
+      model = User
+      fields = ('id', 'username', 'companies')
