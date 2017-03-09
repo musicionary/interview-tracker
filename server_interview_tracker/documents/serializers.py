@@ -9,6 +9,10 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+   documents = serializers.PrimaryKeyRelatedField(
+      many=True,
+      read_only=True)
+
    class Meta:
       model = models.Company
       owner = serializers.ReadOnlyField(source='owner.username')
@@ -40,12 +44,15 @@ class CompanySerializer(serializers.ModelSerializer):
          'created_at',
          'updated_at',
          'owner',
+         'documents',
       )
 
 
 class UserSerializer(serializers.ModelSerializer):
-   companies = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Company.objects.all())
+   companies = serializers.PrimaryKeyRelatedField(
+      many=True,
+      read_only=True)
 
    class Meta:
       model = User
-      fields = ('id', 'username', 'companies')
+      fields = ('id', 'username', 'companies',)

@@ -13,3 +13,12 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the company
         return obj.owner == request.user
+
+class IsSuperUser(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return True
+        else:
+            if request.method == 'DELETE':
+                return False

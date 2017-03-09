@@ -1,32 +1,41 @@
 from django.contrib.auth.models import User
 from . import models
 from . import serializers
-from rest_framework import status
-from rest_framework import generics
+from rest_framework import status, generics, viewsets
 from django.shortcuts import get_object_or_404
-from documents.permissions import IsOwnerOrReadOnly
-#from rest_framework import permissions
+from documents.permissions import IsOwnerOrReadOnly, IsSuperUser
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
-class UserList(generics.ListAPIView):
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user_list', request=request, format=format),
+        'companies': reverse('company_list', request=request, format=format)
+    })
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    This viewset automatically provides 'list' and 'detail' actions.
+    """
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
 
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = serializers.UserSerializer
 
-class ListCreateCompany(generics.ListCreateAPIView):
+class CompanyViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
+    """
     queryset = models.Company.objects.all()
     serializer_class = serializers.CompanySerializer
+    permission_classes = (IsSuperUser, IsOwnerOrReadOnly,)
+
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-
-class RetrieveUpdateDestroyCompany(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.Company.objects.all()
-    serializer_class = serializers.CompanySerializer
-    permission_classes = (IsOwnerOrReadOnly,)
 
 
 class ListCreateDocument(generics.ListCreateAPIView):
