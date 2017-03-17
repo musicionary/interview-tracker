@@ -16,6 +16,17 @@ def api_root(request, format=None):
     })
 
 
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+
+class UserDetail(generics.RetrieveAPIView):
+    """
+    This viewset automatically provides 'list' and 'detail' actions.
+    """
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     This viewset automatically provides 'list' and 'detail' actions.
@@ -36,6 +47,45 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+class ListCreateCompany(generics.ListCreateAPIView):
+    queryset = models.Company.objects.all()
+    serializer_class = serializers.CompanySerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class RetrieveUpdateDestroyCompany(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Company.objects.all()
+    serializer_class = serializers.CompanySerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+
+
+class DocumentViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
+    """
+    queryset = models.Document.objects.all()
+    serializer_class = serializers.DocumentSerializer
+    permission_classes = (IsSuperUser, IsOwnerOrReadOnly,)
+
+    def get_queryset(self):
+        return self.queryset.filter(company_id=self.kwargs.get('company_pk'))
+
+    def perform_create(self, serializer):
+        company = get_object_or_404(
+            models.Company, pk=self.kwargs.get('course_pk'))
+        serializer.save(company=company)
+
+    #get a single object to get a single document
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            company_id = self.kwargs.get('company_pk'),
+            pk=self.kwargs.get('pk')
+        )
 
 
 class ListCreateDocument(generics.ListCreateAPIView):

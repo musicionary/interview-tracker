@@ -27,7 +27,8 @@
       "notes": "",
       "follow_up_steps": "",
       "created_at": "2017-03-05T15:23:54Z",
-      "updated_at": "2017-03-05T15:23:54Z"
+      "updated_at": "2017-03-05T15:23:54Z",
+      "owner": 1
     }
   },
   {
@@ -58,7 +59,8 @@
       "notes": "",
       "follow_up_steps": "",
       "created_at": "2017-03-05T15:23:54Z",
-      "updated_at": "2017-03-05T15:23:54Z"
+      "updated_at": "2017-03-05T15:23:54Z",
+      "owner": 1
     }
   },
   {
@@ -89,7 +91,8 @@
       "notes": "",
       "follow_up_steps": "",
       "created_at": "2017-03-05T15:23:54Z",
-      "updated_at": "2017-03-05T15:23:54Z"
+      "updated_at": "2017-03-05T15:23:54Z",
+      "owner": 1
     }
   }
 ]
